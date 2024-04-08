@@ -1,0 +1,83 @@
+from kivy.app import App
+from kivy.uix.boxlayout import BoxLayout
+from kivy.uix.button import Button
+from kivy.uix.label import Label
+from kivy.uix.popup import Popup
+from kivy.uix.textinput import TextInput
+
+
+class MovieRatingApp(App):
+    def build(self):
+        self.movies_data = []  # List to store movie data (name, rating)
+
+        # Main layout
+        main_layout = BoxLayout(orientation='vertical', spacing=10, padding=10)
+
+        # Input box for movie name
+        self.movie_input = TextInput(hint_text='Enter Movie Name', multiline=False)
+        main_layout.add_widget(self.movie_input)
+
+        # Button to add movie rating
+        add_button = Button(text='Add Rating', on_press=self.show_rating_popup)
+        main_layout.add_widget(add_button)
+
+        # Label to display movie ratings
+        self.rating_label = Label(text='Movie Ratings:\n')
+        main_layout.add_widget(self.rating_label)
+
+        return main_layout
+
+    def show_rating_popup(self, instance):
+        movie_name = self.movie_input.text.strip()
+
+        if not movie_name:
+            self.show_error_popup("Please enter a movie name.")
+            return
+
+        if any(movie[0] == movie_name for movie in self.movies_data):
+            self.show_error_popup(f"{movie_name} already has a rating.")
+            return
+
+        # Create a popup for rating input
+        content = BoxLayout(orientation='vertical', spacing=10, padding=10)
+        rating_input = TextInput(hint_text='Enter Rating (1-10)', multiline=False)
+        content.add_widget(rating_input)
+
+        # Button to submit rating
+        submit_button = Button(text='Submit', on_press=lambda x: self.add_rating(movie_name, rating_input.text))
+        content.add_widget(submit_button)
+
+        popup = Popup(title=f"Rate {movie_name}", content=content, size_hint=(None, None), size=(300, 200))
+        popup.open()
+
+    def add_rating(self, movie_name, rating_str):
+        try:
+            rating = float(rating_str)
+            if 1 <= rating <= 10:
+                self.movies_data.append((movie_name, rating))
+                self.update_rating_label()
+                self.show_message_popup(f"Rating added for {movie_name}")
+            else:
+                self.show_error_popup("Rating should be between 1 and 10.")
+        except ValueError:
+            self.show_error_popup("Invalid rating. Please enter a number.")
+
+    def update_rating_label(self):
+        ratings_text = 'Movie Ratings:\n'
+        for movie, rating in self.movies_data:
+            ratings_text += f"{movie}: {rating}\n"
+        self.rating_label.text = ratings_text
+
+    def show_message_popup(self, message):
+        content = Label(text=message)
+        popup = Popup(title='Message', content=content, size_hint=(None, None), size=(300, 150))
+        popup.open()
+
+    def show_error_popup(self, error_message):
+        content = Label(text=error_message)
+        popup = Popup(title='Error', content=content, size_hint=(None, None), size=(300, 150))
+        popup.open()
+
+
+if __name__ == '__main__':
+    MovieRatingApp().run()
