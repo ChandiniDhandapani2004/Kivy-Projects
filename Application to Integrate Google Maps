@@ -1,0 +1,15 @@
+from kivy.app import App
+from kivy.uix.boxlayout import BoxLayout
+from kivy.garden.mapview import MapView, MapMarker
+class GoogleMapsApp(App): 
+  def build(self): # Create a layout layout = BoxLayout(orientation='vertical')
+# Create a Mapview widget
+mapview = MapView(zoom=10, lat=37.7749, lon=-122.4194) # Set initial coordinates (San Francisco)
+# Create a MapMarker
+marker = MapMarker(lat=37.7749, lon=-122.4194) 
+# Marker at San Francisco
+mapview.add_marker(marker)
+# Add the Mapview widget to the layout
+layout.add_widget(mapview)
+return layout
+if __name__ == '__main__': GoogleMapsApp().run()
