@@ -1,0 +1,36 @@
+from kivy.app import App
+from kivy.uix.boxlayout import BoxLayout
+from kivy.uix.label import Label
+from kivy.uix.button import Button
+from kivy.uix.textinput import TextInput
+import requests
+
+class WebServiceApp(App):
+    def build(self):
+        # UI components
+        self.layout = BoxLayout(orientation='vertical', spacing=10, padding=10)
+        self.label = Label(text='Data from Web Service:', size_hint_y=None, height=30)
+        self.text_input = TextInput(hint_text='Enter Web Service URL', multiline=False, size_hint_y=None, height=30)
+        self.fetch_button = Button(text='Fetch Data', on_press=self.fetch_data, size_hint_y=None, height=40)
+
+        # Adding components to the layout
+        self.layout.add_widget(self.label)
+        self.layout.add_widget(self.text_input)
+        self.layout.add_widget(self.fetch_button)
+
+        return self.layout
+
+    def fetch_data(self, instance):
+        # Get the URL from the text input
+        url = self.text_input.text
+
+        # Fetch data from the web service
+        try:
+            response = requests.get(url)
+            data = response.json()  # assuming the data is in JSON format
+            self.label.text = f'Data from Web Service: {data}'
+        except Exception as e:
+            self.label.text = f'Error fetching data: {e}'
+
+if __name__ == '__main__':
+    WebServiceApp().run()
